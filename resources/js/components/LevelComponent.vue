@@ -1,117 +1,141 @@
 <template>
-	<v-card >
-		<v-card-title>
-			<v-row justify="space-between">
-				<v-col cols="12" md="4">
-					<v-text-field hide-details label="Level" single-line v-model="searchData.level"></v-text-field>
-				</v-col>
-				<v-col cols="12" md="4">
-					<v-text-field hide-details label="Level Type" single-line v-model="searchData.levelType"></v-text-field>
-				</v-col>
-				<v-col cols="12" md="4">
-					<v-text-field hide-details label="Version" single-line v-model="searchData.version"></v-text-field>
-				</v-col>
-				<v-col cols="12" md="4">
-					<v-text-field hide-details label="App Version" single-line v-model="searchData.appVersion"></v-text-field>
-				</v-col>
-				<v-col cols="12" md="4">
-					<div class="my-2">
-						<v-btn @click="searchLevel()" color="#3490dc" dark small>Search</v-btn>
-					</div>
-				</v-col>
-			</v-row>
-		</v-card-title>
-		<div class="container">
-			<v-data-table
-				:expanded="expanded"
-				:headers="headers"
-				:items="data"
-				:loading="true"
-				@click:row="clicked"
-				class="elevation-1"
-				hide-default-footer
-				item-key="name"
-				loading-text="Loading... Please wait"
-				show-expand
+  <v-card>
+    <v-card-title>
+      <v-row justify="space-between">
+        <v-col cols="12" md="4">
+          <v-text-field hide-details label="Level" single-line v-model="searchData.level"></v-text-field>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field hide-details label="Level Type" single-line v-model="searchData.levelType"></v-text-field>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field hide-details label="Version" single-line v-model="searchData.version"></v-text-field>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field
+            hide-details
+            label="App Version"
+            single-line
+            v-model="searchData.appVersion"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="4">
+          <div class="my-2">
+            <v-btn @click="searchLevel()" color="#3490dc" dark small>Search</v-btn>
+          </div>
+        </v-col>
+      </v-row>
+    </v-card-title>
+    <div class="container">
+      <v-data-table
+        :expanded="expanded"
+        :headers="headers"
+        :items="data"
+        :loading="true"
+        @click:row="clicked"
+        class="elevation-1"
+        hide-default-footer
+        item-key="name"
+        loading-text="Loading... Please wait"
+        show-expand
+      >
+        <template v-slot:expanded-item="{ item,headers }">
+          <td :colspan="headers.length" class="text-start p-3">
+            <v-card class="p-2" v-if="item['i']">
+              <v-card-title>{{item.obstacle}}</v-card-title>
+              <v-card-text style="max-width:650px">
+                <v-row :key="'row'+kr" class="ml-2" v-for="(kr,i) in Number(item['g'])">
+                  <v-col
+                    :cols="item['g']"
+                    :key="'col'+ch"
+                    md="1"
+                    style="padding: 0"
+                    v-for="(ch,k) in Number(item['h'])"
+                  >
+                  <div v-if="item['j']">
+                    <div  v-for="(train,keyTrain) in convertImageTrain(item['g'],item['h'],i,k,item['j'],false)" :key="'train'+keyTrain">
+                        <v-img v-if="train.coordinates === i+'_'+k" style="position: absolute; z-index:2"  :src="train.src"></v-img>
+                    </div>
+                  </div>
 
-			>
-				<template v-slot:expanded-item="{ item,headers }">
-					<td :colspan="headers.length" class="text-start p-3">
-						<v-card class="p-2" v-if="item['i']">
-							<v-card-title>{{item.obstacle}}</v-card-title>
-							<v-row :key="'row'+kr" class="ml-2" v-for="(kr,i) in Number(item['g'])">
-								<v-col
-									:cols="item['g']"
-									:key="'col'+ch"
-									md="1"
-									style="padding: 0;"
-									v-for="(ch,k) in Number(item['h'])"
-								>
-									<v-img style="position: absolute; z-index:1"  :src="convertImage(i,k,item['cp'])"></v-img>
-									<v-img src="/storage/images/Cell1.png" v-if="(i+k)%2 == 0"></v-img>
-									<v-img src="/storage/images/Cell2.png" v-if="(i+k)%2 != 0"></v-img>
+                <div v-if="item['l']">
+                    <div v-for="(tram,keytram) in item['l']" :key="'tram'+keytram" >
+                        <div  v-for="(train,keyTrain) in convertImageTrain(item['g'],item['h'],i,k,tram,true)" :key="'train'+keyTrain">
+                            <v-img v-if="train.coordinates === i+'_'+k" style="position: absolute; z-index:2"  :src="train.src"></v-img>
+                        </div>
+                    </div>
+                </div>
 
-								</v-col>
-							</v-row>
-                            <v-card-actions>
-                                <v-btn @click="destroy(item['id'])" >Delete this level</v-btn>
-                            </v-card-actions>
-						</v-card>
-					</td>
-				</template>
-			</v-data-table>
-		</div>
-	</v-card>
+                    <v-img
+                      v-for="(item,key) in convertImage(i,k,item['cp'])"
+                      :style="item.style"
+                      :src="item.src"
+                      :key="key+'_'+i+'_'+k"
+                    ></v-img>
+                    <v-img src="/storage/images/Cell1.png" v-if="(i+k)%2 == 0"></v-img>
+                    <v-img src="/storage/images/Cell2.png" v-if="(i+k)%2 != 0"></v-img>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn @click="destroy(item['id'])">Delete this level</v-btn>
+              </v-card-actions>
+            </v-card>
+          </td>
+        </template>
+      </v-data-table>
+    </div>
+  </v-card>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      search: '',
-      expanded: ['Donut'],
+      search: "",
+      expanded: ["Map"],
       singleExpand: false,
       headers: [
         {
-          text: 'Level',
-          value: 'level'
+          text: "Level",
+          value: "level",
         },
         {
-          text: 'Sub Level',
-          value: 'sublevel'
+          text: "Sub Level",
+          value: "sublevel",
         },
         {
-          text: 'Map Level',
-          value: 'mapLevel'
+          text: "Map Level",
+          value: "mapLevel",
         },
         {
-          text: 'Target',
-          value: 'target'
+          text: "Target",
+          value: "target",
         },
         {
-          text: 'Count Target',
-          value: 'countTarget'
+          text: "Count Target",
+          value: "countTarget",
         },
         {
-          text: 'Move',
-          value: 'move'
+          text: "Move",
+          value: "move",
         },
         {
-          text: 'Hard Level',
-          value: 'hardLevel'
+          text: "Hard Level",
+          value: "hardLevel",
         },
         {
-          text: 'Version',
-          value: 'version'
+          text: "Version",
+          value: "version",
         },
         {
-          text: 'App Version',
-          value: 'appVersion'
+          text: "App Version",
+          value: "appVersion",
         },
         {
-          text: 'Action',
-          text: 'action',
-        }
+          text: "Action",
+          text: "action",
+        },
       ],
       data: [{}],
 
@@ -119,117 +143,303 @@ export default {
         version: null,
         level: null,
         levelType: null,
-        appVersion: null
+        appVersion: null,
       },
       a: 0,
-      entity:null
-    }
+      entity: null,
+      arraycoordinates: []
+    };
   },
   methods: {
     getDataLevel(params) {
       axios
-        .get('api/viewLevel', {
-          params: params
+        .get("api/viewLevel", {
+          params: params,
         })
-        .then(response => {
-          this.data = response.data
-          console.log(this.data)
+        .then((response) => {
+          this.data = response.data;
         })
-        .catch(error => {
-          console.log(error)
-        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
 
     searchLevel() {
-      //   console.log(this.searchData)
-      //   console.log('click')
-      //   if (this.searchLevel.level && this.searchLevel.level) {
-      this.getDataLevel(this.searchData)
-      //   }
+      this.getDataLevel(this.searchData);
     },
     getEntity() {
-     axios
-        .get('api/entity')
-        .then(response => {
-          this.entity = response.data
-          console.log(this.entity.entityType)
+      axios
+        .get("api/entity")
+        .then((response) => {
+          this.entity = response.data;
         })
-        .catch(error => {
-          console.log(error)
-        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     clicked(value) {
-      this.expanded.push(value)
+      this.expanded.push(value);
     },
     show(value) {
-      console.log(value)
     },
-    convertImage(i,k,items){
-        if(items[i+"_"+k] == 'x'){
-            return "storage/images/X.png"
-        }
-        let array = items[i+"_"+k].split("_");
+    convertImage(i, k, items) {
+      let item = items[i + "_" + k];
+      let dataImage = [];
+      if (item == "x") {
+        dataImage.push({
+          src: "storage/images/X.png",
+          style: "position:absolute;z-index:1",
+        });
+        return dataImage;
+      }
+
+      let arrayItem = item.split(",");
+      let dataArray = [];
+      arrayItem.forEach((element) => {
+        let arr = element.split("_");
+        dataArray.push(arr);
+      });
+
+      dataArray.forEach((array) => {
         let txt = "";
-
+        let style = "";
         for (let index = 0; index < array.length; index++) {
-            let first = null;
-            if (index == 0) {
-                first = this.findItem(array[index],this.entity.entityType)
-                txt += first
-                if(first === 'Car'){
-                    txt = ""
-                }
+          if (index == 0) {
+            txt += this.findItem(array[index], this.entity.entityType);
+            if (array[index] == 42) {
+              txt = "";
             }
-            if(first === "Grass"){
-                if (index == 1) {
-                    txt += false
-                    }
-                if (index == 2) {
-                    txt += false
-                }
-            }else{
-                if (index == 1) {
-                    txt += this.findItem(array[index],this.entity.direction)
-                    }
-                if (index == 2) {
-                    txt += this.findItem(array[index],this.entity.entityColor)
-                }
+          }
+          txt = txt == "Helipad" ? "Helicopter" : txt;
+          if (["Grass", "Helicopter", "Snow"].indexOf(txt) > -1) {
+            style = "position:absolute;z-index:1";
+            if (index == 1) {
+              txt += false;
             }
+            if (index == 2) {
+              txt += false;
+            }
+            if (index == 3) {
+              txt += false;
+            }
+          } else if (txt == "TrafficCone") {
+            style = "position:absolute ; z-index:3";
+            if (index == 1) {
+              txt += this.findItem(array[index], this.entity.levels);
+            }
+            if (index && index == 2) {
+              txt += this.findItem(array[index], this.entity.entityColor);
+            }
+          } else if (txt == "Locker") {
+            style = "position:absolute ; z-index:3; margin-top: 15px;";
+            if (index == 1) {
+              txt += this.findItem(array[index], this.entity.levels);
+            }
+          } else if (txt == "Bollard") {
+            style = "position:absolute ; z-index:3";
+            if (index == 1) {
+              txt += this.findItem(array[index], this.entity.bollard);
+            }
+          }
+          else if (txt.search("Barrier") > -1) {
+            style = "position:absolute ; z-index:3";
+            if (index == 1) {
+                txt += this.findItem(array[index], this.entity.direction);
+            }
+          }
+          else if (txt.search("SpaceshipPad") > -1) {
+            style = "position:absolute ; z-index:1";
+            if (index == 1) {
+                txt += this.findItem(array[index], this.entity.directionX) ?? "vertical";
+            }
+          }
+          else if (txt.search("Wreck") > -1) {
+            style = "position:absolute ; z-index:3;";
+          }
+          else if (txt.search("FoldingBarrier") > -1) {
+              style = "position:absolute ; z-index:3";
+            if (index == 1) {
+                txt += this.findItem(array[index], this.entity.direction);
+            }
+          }
+          else if(txt.search("Tunnel") > -1){
+            style = "position:absolute ; z-index:3";
+            if (index == 1) {
+                txt += this.findItem(array[index], this.entity.direction);
+            }
+          }
+          else {
+            style = "position:absolute ; z-index:3;bottom:0px";
+            if (index == 1) {
+              txt += this.findItem(array[index], this.entity.direction);
+            }
+            if (index == 2) {
+              txt += this.findItem(array[index], this.entity.entityColor);
+            }
+          }
+        }
+        if (txt !== "undefined") {
+          if (txt == "Helicopter" || txt == "Fountain") {
+            style = "position:absolute; z-index:1; max-width:200%";
+          }
+          if(txt.search("FoldingBarrierUp") > -1){
+              style += "; bottom:0px"
+          }
+          if(txt.search("FoldingBarrierLeft") > -1 || txt.search("FoldingBarrierRight") > -1){
+              style += ";max-width: 300%"
+          }
+           if(txt.search("FoldingBarrierLeft") > -1){
+              style += ";max-width: 300%;right: 0px "
+          }
+          if(txt.search("SpaceshipPadhorizontal") > -1){
+              style += "; max-width: 290%;bottom: -75px;"
+          }
+          if(txt.search("SpaceshipPadvertical") > -1){
+              style += "; max-width: 200%"
+          }
+          if(txt.search("SpaceshipPadvertical") > -1){
+            //   style += "; max-width: 290%;bottom: -75px;"
+          }
 
+          txt = txt.replace("undefined", "");
+          dataImage.push({
+            src: "storage/images/" + txt + ".png",
+            style: style,
+          });
         }
-        console.log(txt);
-        if(txt !== "undefined"){
-            return "storage/images/"+txt+".png"
-        }
+      });
+      //   console.log(dataImage);
+      return dataImage;
     },
 
-    findItem(item,data){
-        return Object.keys(data).find(key => data[key] === Number.parseInt(item));
+    convertImageTrain(g,h,i,k,itemtrain,tram){
+        let arrTrain = [];
+        for (let index = 0; index < itemtrain.length; index++) {
+            if (itemtrain.length - 2 > index) {
+                let arr1 = itemtrain[index].split('_');
+                let arr2 = itemtrain[index + 1 == itemtrain.length ? index : index + 1].split('_');
+                let arr3 = itemtrain[index + 2 == itemtrain.length ? index : index + 2].split('_');
+                let txt = ""
+                if (arr1[0] == arr2[0] && arr1[1] < arr2[1]) {
+                    if (arr2[0] > arr3[0]) {
+                        txt = '|DownLeft';
+                    }
+                    if (arr2[0] < arr3[0]) {
+                        txt = '|UpLeft';
+                    }
+                }
+                if (arr1[0] == arr2[0] && arr1[1] > arr2[1]) {
+                    if (arr2[0] > arr3[0]) {
+                        txt = '|DownRight';
+                    }
+                    if (arr2[0] < arr3[0]) {
+                        txt = '|UpRight';
+                    }
+                }
+                if (arr1[0] > arr2[0] && arr1[1] == arr2[1]) {
+                    if (arr2[1] > arr3[1]) {
+                        txt = '|UpLeft'; // right down
+                    }
+                    if (arr2[1] < arr3[1]) {
+                        txt = '|UpRight'; // left down
+                    }
+                }
+                if (arr1[0] < arr2[0] && arr1[1] == arr2[1]) {
+                    if (arr2[1] > arr3[1]) {
+                        txt = '|DownLeft'; // right up
+                    }
+                    if (arr2[1] < arr3[1]) {
+                        txt = '|DownRight';// = Left up
+                    }
+                }
+                arrTrain.push(itemtrain[index + 1] +""+ txt)
+            }
+        }
+
+        for (let index = 0; index < itemtrain.length; index++) {
+            let arr1 = itemtrain[index].split('_')
+            let arr2 = itemtrain[index + 1 == itemtrain.length ? index : index + 1].split('_');
+            let temp = null
+            if (Number.parseInt(arr1[0]) == Number.parseInt(arr2[0]) && Number.parseInt(arr1[1]) < Number.parseInt(arr2[1])) { // ngang trai
+                for (let jindex = 1; jindex < Number.parseInt(arr2[1]) - Number.parseInt(arr1[1]); jindex++) {
+                    temp = Number.parseInt(arr1[0]) + '_' + (Number.parseInt(arr1[1]) + Number.parseInt(jindex)) + '|Horizontal';
+                    arrTrain.push(temp);
+                }
+            }else if (Number.parseInt(arr1[0]) == Number.parseInt(arr2[0]) && Number.parseInt(arr1[1]) > Number.parseInt(arr2[1])) { // ngang phai
+                for (let jindex = 1; jindex < Number.parseInt(arr1[1]) - Number.parseInt(arr2[1]); jindex++) {
+                    temp = Number.parseInt(arr1[0]) + '_' + (Number.parseInt(arr1[1]) - Number.parseInt(jindex)) + '|Horizontal';
+                    arrTrain.push(temp);
+                }
+            } else if (Number.parseInt(arr1[1]) == Number.parseInt(arr2[1]) && Number.parseInt(arr1[0]) > Number.parseInt(arr2[0])) { // doc len
+                for (let jindex = 1;jindex< Number.parseInt(arr1[0]) - Number.parseInt(arr2[0]); jindex++) {
+                    temp = (Number.parseInt(arr1[0]) - Number.parseInt(jindex)) + '_' + Number.parseInt(arr1[1]) + '|Vertical';
+                    arrTrain.push(temp);
+                }
+            }else if (Number.parseInt(arr1[1]) == Number.parseInt(arr2[1]) && Number.parseInt(arr1[0]) < Number.parseInt(arr2[0])) { // doc xuong
+                for (let jindex = 1; jindex < Number.parseInt(arr2[0]) - Number.parseInt(arr1[0]); jindex++) {
+                    temp = (Number.parseInt(arr1[0]) + Number.parseInt(jindex)) + '_' + Number.parseInt(arr1[1]) + '|Vertical';
+                    arrTrain.push(temp);
+                }
+            }
+        }
+
+        let arrfirst = itemtrain[0].split('_');
+        let arrlast = itemtrain[itemtrain.length - 1].split('_');
+
+        if (arrfirst[1] > 0 && arrfirst[1] < g-1 && (arrfirst[0] == 0 || arrfirst[0] == g-1)) {
+            arrTrain.push(itemtrain[0] + '|Vertical')
+        }
+        if (arrfirst[0] > 0 && arrfirst[0] < h-1 && (arrfirst[1] == 0 || arrfirst[1] == h-1)) {
+            arrTrain.push(itemtrain[0] + '|Horizontal')
+        }
+        if (arrlast[1] > 0 && arrlast[1] < g-1 && (arrlast[0] == 0 || arrlast[0] == g-1)) {
+            arrTrain.push(itemtrain[itemtrain.length - 1] + '|Vertical')
+        }
+        if (arrlast[0] > 0 && arrlast[0] < h-1 && (arrlast[1] == 0 || arrlast[1] == h-1)) {
+            arrTrain.push(itemtrain[itemtrain.length - 1] + '|Horizontal')
+        }
+
+        let dataTrain = []
+        // this.arraycoordinates.push(arrTrain)
+        // console.log(this.arraycoordinates)
+        arrTrain.forEach(element => {
+            let trainPath = element.split("|");
+            dataTrain.push({
+                coordinates: trainPath[0],
+                src: tram == true? "storage/images/RailroadTram"+trainPath[1]+".png" : "storage/images/Railroad"+trainPath[1]+".png"
+            })
+        });
+        return dataTrain
     },
 
-    destroy(id){
-        axios
-            .delete('api/level/delete',{
-                params:{
-                    id:id
-                }
-            })
-            .then(response => {
-                var index = this.data.findIndex(function(o){
-                    return o.id === id;
-                })
-                if (index !== -1) this.data.splice(index, 1);
-                console.log(response)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }
+    findItem(item, data) {
+      return Object.keys(data).find(
+        (key) => data[key] === Number.parseInt(item)
+      );
+    },
+
+    destroy(id) {
+      // axios
+      //     .delete('api/level/delete',{
+      //         params:{
+      //             id:id
+      //         }
+      //     })
+      //     .then(response => {
+      //         var index = this.data.findIndex(function(o){
+      //             return o.id === id;
+      //         })
+      //         if (index !== -1) this.data.splice(index, 1);
+      //         console.log(response)
+      //     })
+      //     .catch(error => {
+      //         console.log(error)
+      //     })
+    },
   },
 
-
   mounted() {
-      this.getEntity()
-  }
-}
+    this.getEntity();
+  },
+};
 </script>

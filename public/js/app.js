@@ -2005,42 +2005,66 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      search: '',
-      expanded: ['Donut'],
+      search: "",
+      expanded: ["Map"],
       singleExpand: false,
       headers: [{
-        text: 'Level',
-        value: 'level'
+        text: "Level",
+        value: "level"
       }, {
-        text: 'Sub Level',
-        value: 'sublevel'
+        text: "Sub Level",
+        value: "sublevel"
       }, {
-        text: 'Map Level',
-        value: 'mapLevel'
+        text: "Map Level",
+        value: "mapLevel"
       }, {
-        text: 'Target',
-        value: 'target'
+        text: "Target",
+        value: "target"
       }, {
-        text: 'Count Target',
-        value: 'countTarget'
+        text: "Count Target",
+        value: "countTarget"
       }, {
-        text: 'Move',
-        value: 'move'
+        text: "Move",
+        value: "move"
       }, {
-        text: 'Hard Level',
-        value: 'hardLevel'
+        text: "Hard Level",
+        value: "hardLevel"
       }, {
-        text: 'Version',
-        value: 'version'
+        text: "Version",
+        value: "version"
       }, {
-        text: 'App Version',
-        value: 'appVersion'
+        text: "App Version",
+        value: "appVersion"
       }, _defineProperty({
-        text: 'Action'
-      }, "text", 'action')],
+        text: "Action"
+      }, "text", "action")],
       data: [{}],
       searchData: {
         version: null,
@@ -2049,34 +2073,30 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         appVersion: null
       },
       a: 0,
-      entity: null
+      entity: null,
+      arraycoordinates: []
     };
   },
   methods: {
     getDataLevel: function getDataLevel(params) {
       var _this = this;
 
-      axios.get('api/viewLevel', {
+      axios.get("api/viewLevel", {
         params: params
       }).then(function (response) {
         _this.data = response.data;
-        console.log(_this.data);
       })["catch"](function (error) {
         console.log(error);
       });
     },
     searchLevel: function searchLevel() {
-      //   console.log(this.searchData)
-      //   console.log('click')
-      //   if (this.searchLevel.level && this.searchLevel.level) {
-      this.getDataLevel(this.searchData); //   }
+      this.getDataLevel(this.searchData);
     },
     getEntity: function getEntity() {
       var _this2 = this;
 
-      axios.get('api/entity').then(function (response) {
+      axios.get("api/entity").then(function (response) {
         _this2.entity = response.data;
-        console.log(_this2.entity.entityType);
       })["catch"](function (error) {
         console.log(error);
       });
@@ -2084,76 +2104,297 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     clicked: function clicked(value) {
       this.expanded.push(value);
     },
-    show: function show(value) {
-      console.log(value);
-    },
+    show: function show(value) {},
     convertImage: function convertImage(i, k, items) {
-      if (items[i + "_" + k] == 'x') {
-        return "storage/images/X.png";
+      var _this3 = this;
+
+      var item = items[i + "_" + k];
+      var dataImage = [];
+
+      if (item == "x") {
+        dataImage.push({
+          src: "storage/images/X.png",
+          style: "position:absolute;z-index:1"
+        });
+        return dataImage;
       }
 
-      var array = items[i + "_" + k].split("_");
-      var txt = "";
+      var arrayItem = item.split(",");
+      var dataArray = [];
+      arrayItem.forEach(function (element) {
+        var arr = element.split("_");
+        dataArray.push(arr);
+      });
+      dataArray.forEach(function (array) {
+        var txt = "";
+        var style = "";
 
-      for (var index = 0; index < array.length; index++) {
-        var first = null;
+        for (var index = 0; index < array.length; index++) {
+          if (index == 0) {
+            txt += _this3.findItem(array[index], _this3.entity.entityType);
 
-        if (index == 0) {
-          first = this.findItem(array[index], this.entity.entityType);
-          txt += first;
+            if (array[index] == 42) {
+              txt = "";
+            }
+          }
 
-          if (first === 'Car') {
-            txt = "";
+          txt = txt == "Helipad" ? "Helicopter" : txt;
+
+          if (["Grass", "Helicopter", "Snow"].indexOf(txt) > -1) {
+            style = "position:absolute;z-index:1";
+
+            if (index == 1) {
+              txt += false;
+            }
+
+            if (index == 2) {
+              txt += false;
+            }
+
+            if (index == 3) {
+              txt += false;
+            }
+          } else if (txt == "TrafficCone") {
+            style = "position:absolute ; z-index:3";
+
+            if (index == 1) {
+              txt += _this3.findItem(array[index], _this3.entity.levels);
+            }
+
+            if (index && index == 2) {
+              txt += _this3.findItem(array[index], _this3.entity.entityColor);
+            }
+          } else if (txt == "Locker") {
+            style = "position:absolute ; z-index:3; margin-top: 15px;";
+
+            if (index == 1) {
+              txt += _this3.findItem(array[index], _this3.entity.levels);
+            }
+          } else if (txt == "Bollard") {
+            style = "position:absolute ; z-index:3";
+
+            if (index == 1) {
+              txt += _this3.findItem(array[index], _this3.entity.bollard);
+            }
+          } else if (txt.search("Barrier") > -1) {
+            style = "position:absolute ; z-index:3";
+
+            if (index == 1) {
+              txt += _this3.findItem(array[index], _this3.entity.direction);
+            }
+          } else if (txt.search("SpaceshipPad") > -1) {
+            style = "position:absolute ; z-index:1";
+
+            if (index == 1) {
+              var _this3$findItem;
+
+              txt += (_this3$findItem = _this3.findItem(array[index], _this3.entity.directionX)) !== null && _this3$findItem !== void 0 ? _this3$findItem : "vertical";
+            }
+          } else if (txt.search("Wreck") > -1) {
+            style = "position:absolute ; z-index:3;";
+          } else if (txt.search("FoldingBarrier") > -1) {
+            style = "position:absolute ; z-index:3";
+
+            if (index == 1) {
+              txt += _this3.findItem(array[index], _this3.entity.direction);
+            }
+          } else if (txt.search("Tunnel") > -1) {
+            style = "position:absolute ; z-index:3";
+
+            if (index == 1) {
+              txt += _this3.findItem(array[index], _this3.entity.direction);
+            }
+          } else {
+            style = "position:absolute ; z-index:3;bottom:0px";
+
+            if (index == 1) {
+              txt += _this3.findItem(array[index], _this3.entity.direction);
+            }
+
+            if (index == 2) {
+              txt += _this3.findItem(array[index], _this3.entity.entityColor);
+            }
           }
         }
 
-        if (first === "Grass") {
-          if (index == 1) {
-            txt += false;
+        if (txt !== "undefined") {
+          if (txt == "Helicopter" || txt == "Fountain") {
+            style = "position:absolute; z-index:1; max-width:200%";
           }
 
-          if (index == 2) {
-            txt += false;
-          }
-        } else {
-          if (index == 1) {
-            txt += this.findItem(array[index], this.entity.direction);
+          if (txt.search("FoldingBarrierUp") > -1) {
+            style += "; bottom:0px";
           }
 
-          if (index == 2) {
-            txt += this.findItem(array[index], this.entity.entityColor);
+          if (txt.search("FoldingBarrierLeft") > -1 || txt.search("FoldingBarrierRight") > -1) {
+            style += ";max-width: 300%";
+          }
+
+          if (txt.search("FoldingBarrierLeft") > -1) {
+            style += ";max-width: 300%;right: 0px ";
+          }
+
+          if (txt.search("SpaceshipPadhorizontal") > -1) {
+            style += "; max-width: 290%;bottom: -75px;";
+          }
+
+          if (txt.search("SpaceshipPadvertical") > -1) {
+            style += "; max-width: 200%";
+          }
+
+          if (txt.search("SpaceshipPadvertical") > -1) {//   style += "; max-width: 290%;bottom: -75px;"
+          }
+
+          txt = txt.replace("undefined", "");
+          dataImage.push({
+            src: "storage/images/" + txt + ".png",
+            style: style
+          });
+        }
+      }); //   console.log(dataImage);
+
+      return dataImage;
+    },
+    convertImageTrain: function convertImageTrain(g, h, i, k, itemtrain, tram) {
+      var arrTrain = [];
+
+      for (var index = 0; index < itemtrain.length; index++) {
+        if (itemtrain.length - 2 > index) {
+          var arr1 = itemtrain[index].split('_');
+          var arr2 = itemtrain[index + 1 == itemtrain.length ? index : index + 1].split('_');
+          var arr3 = itemtrain[index + 2 == itemtrain.length ? index : index + 2].split('_');
+          var txt = "";
+
+          if (arr1[0] == arr2[0] && arr1[1] < arr2[1]) {
+            if (arr2[0] > arr3[0]) {
+              txt = '|DownLeft';
+            }
+
+            if (arr2[0] < arr3[0]) {
+              txt = '|UpLeft';
+            }
+          }
+
+          if (arr1[0] == arr2[0] && arr1[1] > arr2[1]) {
+            if (arr2[0] > arr3[0]) {
+              txt = '|DownRight';
+            }
+
+            if (arr2[0] < arr3[0]) {
+              txt = '|UpRight';
+            }
+          }
+
+          if (arr1[0] > arr2[0] && arr1[1] == arr2[1]) {
+            if (arr2[1] > arr3[1]) {
+              txt = '|UpLeft'; // right down
+            }
+
+            if (arr2[1] < arr3[1]) {
+              txt = '|UpRight'; // left down
+            }
+          }
+
+          if (arr1[0] < arr2[0] && arr1[1] == arr2[1]) {
+            if (arr2[1] > arr3[1]) {
+              txt = '|DownLeft'; // right up
+            }
+
+            if (arr2[1] < arr3[1]) {
+              txt = '|DownRight'; // = Left up
+            }
+          }
+
+          arrTrain.push(itemtrain[index + 1] + "" + txt);
+        }
+      }
+
+      for (var _index = 0; _index < itemtrain.length; _index++) {
+        var _arr = itemtrain[_index].split('_');
+
+        var _arr2 = itemtrain[_index + 1 == itemtrain.length ? _index : _index + 1].split('_');
+
+        var temp = null;
+
+        if (Number.parseInt(_arr[0]) == Number.parseInt(_arr2[0]) && Number.parseInt(_arr[1]) < Number.parseInt(_arr2[1])) {
+          // ngang trai
+          for (var jindex = 1; jindex < Number.parseInt(_arr2[1]) - Number.parseInt(_arr[1]); jindex++) {
+            temp = Number.parseInt(_arr[0]) + '_' + (Number.parseInt(_arr[1]) + Number.parseInt(jindex)) + '|Horizontal';
+            arrTrain.push(temp);
+          }
+        } else if (Number.parseInt(_arr[0]) == Number.parseInt(_arr2[0]) && Number.parseInt(_arr[1]) > Number.parseInt(_arr2[1])) {
+          // ngang phai
+          for (var _jindex = 1; _jindex < Number.parseInt(_arr[1]) - Number.parseInt(_arr2[1]); _jindex++) {
+            temp = Number.parseInt(_arr[0]) + '_' + (Number.parseInt(_arr[1]) - Number.parseInt(_jindex)) + '|Horizontal';
+            arrTrain.push(temp);
+          }
+        } else if (Number.parseInt(_arr[1]) == Number.parseInt(_arr2[1]) && Number.parseInt(_arr[0]) > Number.parseInt(_arr2[0])) {
+          // doc len
+          for (var _jindex2 = 1; _jindex2 < Number.parseInt(_arr[0]) - Number.parseInt(_arr2[0]); _jindex2++) {
+            temp = Number.parseInt(_arr[0]) - Number.parseInt(_jindex2) + '_' + Number.parseInt(_arr[1]) + '|Vertical';
+            arrTrain.push(temp);
+          }
+        } else if (Number.parseInt(_arr[1]) == Number.parseInt(_arr2[1]) && Number.parseInt(_arr[0]) < Number.parseInt(_arr2[0])) {
+          // doc xuong
+          for (var _jindex3 = 1; _jindex3 < Number.parseInt(_arr2[0]) - Number.parseInt(_arr[0]); _jindex3++) {
+            temp = Number.parseInt(_arr[0]) + Number.parseInt(_jindex3) + '_' + Number.parseInt(_arr[1]) + '|Vertical';
+            arrTrain.push(temp);
           }
         }
       }
 
-      console.log(txt);
+      var arrfirst = itemtrain[0].split('_');
+      var arrlast = itemtrain[itemtrain.length - 1].split('_');
 
-      if (txt !== "undefined") {
-        return "storage/images/" + txt + ".png";
+      if (arrfirst[1] > 0 && arrfirst[1] < g - 1 && (arrfirst[0] == 0 || arrfirst[0] == g - 1)) {
+        arrTrain.push(itemtrain[0] + '|Vertical');
       }
+
+      if (arrfirst[0] > 0 && arrfirst[0] < h - 1 && (arrfirst[1] == 0 || arrfirst[1] == h - 1)) {
+        arrTrain.push(itemtrain[0] + '|Horizontal');
+      }
+
+      if (arrlast[1] > 0 && arrlast[1] < g - 1 && (arrlast[0] == 0 || arrlast[0] == g - 1)) {
+        arrTrain.push(itemtrain[itemtrain.length - 1] + '|Vertical');
+      }
+
+      if (arrlast[0] > 0 && arrlast[0] < h - 1 && (arrlast[1] == 0 || arrlast[1] == h - 1)) {
+        arrTrain.push(itemtrain[itemtrain.length - 1] + '|Horizontal');
+      }
+
+      var dataTrain = []; // this.arraycoordinates.push(arrTrain)
+      // console.log(this.arraycoordinates)
+
+      arrTrain.forEach(function (element) {
+        var trainPath = element.split("|");
+        dataTrain.push({
+          coordinates: trainPath[0],
+          src: tram == true ? "storage/images/RailroadTram" + trainPath[1] + ".png" : "storage/images/Railroad" + trainPath[1] + ".png"
+        });
+      });
+      return dataTrain;
     },
     findItem: function findItem(item, data) {
       return Object.keys(data).find(function (key) {
         return data[key] === Number.parseInt(item);
       });
     },
-    destroy: function destroy(id) {
-      var _this3 = this;
-
-      axios["delete"]('api/level/delete', {
-        params: {
-          id: id
-        }
-      }).then(function (response) {
-        var index = _this3.data.findIndex(function (o) {
-          return o.id === id;
-        });
-
-        if (index !== -1) _this3.data.splice(index, 1);
-        console.log(response);
-      })["catch"](function (error) {
-        console.log(error);
-      });
+    destroy: function destroy(id) {// axios
+      //     .delete('api/level/delete',{
+      //         params:{
+      //             id:id
+      //         }
+      //     })
+      //     .then(response => {
+      //         var index = this.data.findIndex(function(o){
+      //             return o.id === id;
+      //         })
+      //         if (index !== -1) this.data.splice(index, 1);
+      //         console.log(response)
+      //     })
+      //     .catch(error => {
+      //         console.log(error)
+      //     })
     }
   },
   mounted: function mounted() {
@@ -38563,57 +38804,166 @@ var render = function() {
                                   _vm._v(_vm._s(item.obstacle))
                                 ]),
                                 _vm._v(" "),
-                                _vm._l(Number(item["g"]), function(kr, i) {
-                                  return _c(
-                                    "v-row",
-                                    { key: "row" + kr, staticClass: "ml-2" },
-                                    _vm._l(Number(item["h"]), function(ch, k) {
-                                      return _c(
-                                        "v-col",
-                                        {
-                                          key: "col" + ch,
-                                          staticStyle: { padding: "0" },
-                                          attrs: { cols: item["g"], md: "1" }
-                                        },
-                                        [
-                                          _c("v-img", {
-                                            staticStyle: {
-                                              position: "absolute",
-                                              "z-index": "1"
-                                            },
-                                            attrs: {
-                                              src: _vm.convertImage(
+                                _c(
+                                  "v-card-text",
+                                  { staticStyle: { "max-width": "650px" } },
+                                  _vm._l(Number(item["g"]), function(kr, i) {
+                                    return _c(
+                                      "v-row",
+                                      { key: "row" + kr, staticClass: "ml-2" },
+                                      _vm._l(Number(item["h"]), function(
+                                        ch,
+                                        k
+                                      ) {
+                                        return _c(
+                                          "v-col",
+                                          {
+                                            key: "col" + ch,
+                                            staticStyle: { padding: "0" },
+                                            attrs: { cols: item["g"], md: "1" }
+                                          },
+                                          [
+                                            item["j"]
+                                              ? _c(
+                                                  "div",
+                                                  _vm._l(
+                                                    _vm.convertImageTrain(
+                                                      item["g"],
+                                                      item["h"],
+                                                      i,
+                                                      k,
+                                                      item["j"],
+                                                      false
+                                                    ),
+                                                    function(train, keyTrain) {
+                                                      return _c(
+                                                        "div",
+                                                        {
+                                                          key:
+                                                            "train" + keyTrain
+                                                        },
+                                                        [
+                                                          train.coordinates ===
+                                                          i + "_" + k
+                                                            ? _c("v-img", {
+                                                                staticStyle: {
+                                                                  position:
+                                                                    "absolute",
+                                                                  "z-index": "2"
+                                                                },
+                                                                attrs: {
+                                                                  src: train.src
+                                                                }
+                                                              })
+                                                            : _vm._e()
+                                                        ],
+                                                        1
+                                                      )
+                                                    }
+                                                  ),
+                                                  0
+                                                )
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            item["l"]
+                                              ? _c(
+                                                  "div",
+                                                  _vm._l(item["l"], function(
+                                                    tram,
+                                                    keytram
+                                                  ) {
+                                                    return _c(
+                                                      "div",
+                                                      { key: "tram" + keytram },
+                                                      _vm._l(
+                                                        _vm.convertImageTrain(
+                                                          item["g"],
+                                                          item["h"],
+                                                          i,
+                                                          k,
+                                                          tram,
+                                                          true
+                                                        ),
+                                                        function(
+                                                          train,
+                                                          keyTrain
+                                                        ) {
+                                                          return _c(
+                                                            "div",
+                                                            {
+                                                              key:
+                                                                "train" +
+                                                                keyTrain
+                                                            },
+                                                            [
+                                                              train.coordinates ===
+                                                              i + "_" + k
+                                                                ? _c("v-img", {
+                                                                    staticStyle: {
+                                                                      position:
+                                                                        "absolute",
+                                                                      "z-index":
+                                                                        "2"
+                                                                    },
+                                                                    attrs: {
+                                                                      src:
+                                                                        train.src
+                                                                    }
+                                                                  })
+                                                                : _vm._e()
+                                                            ],
+                                                            1
+                                                          )
+                                                        }
+                                                      ),
+                                                      0
+                                                    )
+                                                  }),
+                                                  0
+                                                )
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            _vm._l(
+                                              _vm.convertImage(
                                                 i,
                                                 k,
                                                 item["cp"]
-                                              )
-                                            }
-                                          }),
-                                          _vm._v(" "),
-                                          (i + k) % 2 == 0
-                                            ? _c("v-img", {
-                                                attrs: {
-                                                  src:
-                                                    "/storage/images/Cell1.png"
-                                                }
-                                              })
-                                            : _vm._e(),
-                                          _vm._v(" "),
-                                          (i + k) % 2 != 0
-                                            ? _c("v-img", {
-                                                attrs: {
-                                                  src:
-                                                    "/storage/images/Cell2.png"
-                                                }
-                                              })
-                                            : _vm._e()
-                                        ],
-                                        1
-                                      )
-                                    }),
-                                    1
-                                  )
-                                }),
+                                              ),
+                                              function(item, key) {
+                                                return _c("v-img", {
+                                                  key: key + "_" + i + "_" + k,
+                                                  style: item.style,
+                                                  attrs: { src: item.src }
+                                                })
+                                              }
+                                            ),
+                                            _vm._v(" "),
+                                            (i + k) % 2 == 0
+                                              ? _c("v-img", {
+                                                  attrs: {
+                                                    src:
+                                                      "/storage/images/Cell1.png"
+                                                  }
+                                                })
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            (i + k) % 2 != 0
+                                              ? _c("v-img", {
+                                                  attrs: {
+                                                    src:
+                                                      "/storage/images/Cell2.png"
+                                                  }
+                                                })
+                                              : _vm._e()
+                                          ],
+                                          2
+                                        )
+                                      }),
+                                      1
+                                    )
+                                  }),
+                                  1
+                                ),
                                 _vm._v(" "),
                                 _c(
                                   "v-card-actions",
@@ -38633,7 +38983,7 @@ var render = function() {
                                   1
                                 )
                               ],
-                              2
+                              1
                             )
                           : _vm._e()
                       ],

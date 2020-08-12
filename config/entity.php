@@ -67,11 +67,19 @@ return [
         "Lv1" => 1,
         "Lv2" => 2,
         "Lv3" => 3,
+        "Lv4" => 4,
+        "Lv5" => 5,
+        "Lv6" => 6,
+        "Lv7" => 7,
+    ],
+    "directionX" => [
+        "horizontal" => 0,
+        "vertical" => 1,
     ],
 
     "clockwise" => [
-        "clockwise" => 0,
-        false => 1
+        "clockwiseT" => 0,
+        "clockwiseF" => 1
     ],
 
     "bollard" => [
