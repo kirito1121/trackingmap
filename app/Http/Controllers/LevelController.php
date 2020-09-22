@@ -336,7 +336,8 @@ class LevelController extends Controller
                     );
                 // }
             }
-
+            Log::info("--------------arrayInsert------------------");
+            Log::info($arrayInsert);
             if (count($arrayInsert) > 0) {
                 DB::table('levels')->insert($arrayInsert);
             }
