@@ -45,6 +45,8 @@ return [
         "Spaceship" => 65, // target
         "Virus" => 85,
         "FoldingBarrier" => 66,
+        "Bench" => 67,
+        "ContainerTruck" => 68
     ],
 
     "entityColor" => [

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use function PHPSTORM_META\map;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -82,10 +81,11 @@ class LevelController extends Controller
         $levelVersion = $request->get('version');
         $appVersion = $request->get('appVersion');
         $levelType = intval($request->get('levelType'));
-        return $this->readDataMap($level, $levelType, $levelVersion, $appVersion);
+        $sublevel = intval($request->get('sublevel'));
+        return $this->readDataMap($level, $levelType, $levelVersion, $appVersion,$sublevel);
     }
 
-    public function readDataMap($level, $levelType = null, $levelVersion = null, $appVersion = null)
+    public function readDataMap($level, $levelType = null, $levelVersion = null, $appVersion = null,$sublevel)
     {
         if (!isset($level)) {
             return [];
@@ -111,6 +111,9 @@ class LevelController extends Controller
             })
             ->when($levelType >= 0, function ($query) use ($type) {
                 $query->where('levelType', $type);
+            })
+            ->when($sublevel >= 0, function ($query) use ($sublevel) {
+                $query->where('sublevel', $sublevel);
             })
             ->orderBy('sublevel', 'ASC')
             ->orderBy('levelVersion', 'DESC')
@@ -138,6 +141,7 @@ class LevelController extends Controller
                 'hardLevel' => $levelitem['k'] == 0 ? 'No' : 'Yes',
                 'version' => $levelitem['v'],
                 'appVersion' => $level->appVersion,
+                'score' => $levelitem['d'],
                 'c' => $c,
                 'i' => $levelitem['i'],
                 'j' => $levelitem['j'] ?? null,
@@ -291,6 +295,7 @@ class LevelController extends Controller
     public function pushLevels(Request $request)
     {
         try {
+            Log::info($request->data);
             $data = json_decode(trim($request->data));
             $levelType = $request->levelType;
             $type = null;
@@ -301,24 +306,24 @@ class LevelController extends Controller
             } else {
                 $type = "EventX";
             }
-            $lvs = collect(DB::table('levels')->where('levelType', $type)->get());
+            // $lvs = collect(DB::table('levels')->where('levelType', $type)->get());
             $arrayInsert = [];
             foreach ($data as $item) {
-                if (count($lvs) > 0) {
-                    $levels = $lvs->where('level', $item->level);
-                    if (count($levels) > 0) {
-                        if (!in_array($item->data, $levels->pluck('data')->toArray())) {
-                            array_push($arrayInsert, [
-                                'level' => $item->level,
-                                'sublevel' => $item->sublevel,
-                                'levelVersion' => $item->levelVersion,
-                                'appVersion' => $item->appVersion,
-                                'data' => $item->data,
-                                'levelType' => $type,
-                            ]);
-                        }
-                    }
-                } else {
+                // if (count($lvs) > 0) {
+                //     $levels = $lvs->where('level', $item->level);
+                //     if (count($levels) > 0) {
+                //         if (!in_array($item->data, $levels->pluck('data')->toArray())) {
+                //             array_push($arrayInsert, [
+                //                 'level' => $item->level,
+                //                 'sublevel' => $item->sublevel,
+                //                 'levelVersion' => $item->levelVersion,
+                //                 'appVersion' => $item->appVersion,
+                //                 'data' => $item->data,
+                //                 'levelType' => $type,
+                //             ]);
+                //         }
+                //     }
+                // } else {
                     array_push($arrayInsert,
                         [
                             'level' => $item->level,
@@ -329,7 +334,7 @@ class LevelController extends Controller
                             'levelType' => $type,
                         ]
                     );
-                }
+                // }
             }
 
             if (count($arrayInsert) > 0) {
@@ -397,7 +402,7 @@ class LevelController extends Controller
             if ($levelType == 0) {
                 $type = 'Saga';
             } else if ($levelType == 1) {
-                $type = 'RewardRush/ChallengeRace';
+                $type = 'Rush';
             } else {
                 $type = "EventX";
             }

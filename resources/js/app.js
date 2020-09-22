@@ -29,5 +29,6 @@ Vue.component('level-component', require('./components/LevelComponent.vue').defa
  */
 import vuetify from './plugins/vuetify'
 const app = new Vue({
-    el: '#app',vuetify
+    el: '#app',
+    vuetify
 });

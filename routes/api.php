@@ -18,6 +18,7 @@ Route::get('versions', 'VersionController@index');
 Route::get('entity', 'VersionController@entity');
 Route::get('viewLevel', 'LevelController@viewLevel');
 Route::delete('level/delete', 'LevelController@delete');
+Route::get('level/playData', 'TrackingPlayDataController@getDataPlay');
 
 
 Route::post('pushLevel', 'LevelController@pushLevel');
