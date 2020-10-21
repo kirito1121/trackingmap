@@ -46,7 +46,11 @@ return [
         "Virus" => 85,
         "FoldingBarrier" => 66,
         "Bench" => 67,
-        "ContainerTruck" => 68
+        "ContainerTruck" => 68,
+        "ColorChanger" => 27,
+        "RotateRedirecter" => 28,
+        "SnowBomb" => 69,
+        "SnowCar" => 70
     ],
 
     "entityColor" => [
@@ -106,10 +110,12 @@ return [
         "CollectFountain" => 13,
         "CollectConstruction" => 14,
         "ClearSpaceshipPad" => 15,
+        "CollectBench" => 16
     ],
     "levelType" => [
         "Saga" => 0, // Clear the Board
         "Rush" => 1,
+        "Adventure" => 3,
         "EventX" => 2,
     ],
     "obsType" => [

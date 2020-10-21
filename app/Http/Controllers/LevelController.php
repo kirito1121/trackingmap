@@ -95,6 +95,9 @@ class LevelController extends Controller
             $type = 'Saga';
         } else if ($levelType === 1) {
             $type = 'Rush';
+        }
+        else if ($levelType === 2) {
+            $type = 'Adventure';
         } else {
             $type = "EventX";
         }
@@ -142,6 +145,7 @@ class LevelController extends Controller
                 'version' => $levelitem['v'],
                 'appVersion' => $level->appVersion,
                 'score' => $levelitem['d'],
+                'gara' => $levelitem['f'] ?? null,
                 'c' => $c,
                 'i' => $levelitem['i'],
                 'j' => $levelitem['j'] ?? null,
@@ -298,11 +302,14 @@ class LevelController extends Controller
             Log::info($request->data);
             $data = json_decode(trim($request->data));
             $levelType = $request->levelType;
+            Log::info($levelType);
             $type = null;
             if ($levelType == 0) {
                 $type = 'Saga';
             } else if ($levelType == 1) {
                 $type = 'Rush';
+            } else if ($levelType == 2) {
+                $type = 'Adventure';
             } else {
                 $type = "EventX";
             }
@@ -360,6 +367,8 @@ class LevelController extends Controller
                 $type = 'Saga';
             } else if ($levelType == 1) {
                 $type = 'Rush';
+            } else if ($levelType == 2) {
+                $type = 'Adventure';
             } else {
                 $type = "EventX";
             }
@@ -404,6 +413,8 @@ class LevelController extends Controller
                 $type = 'Saga';
             } else if ($levelType == 1) {
                 $type = 'Rush';
+            } else if ($levelType == 2) {
+                $type = 'Adventure';
             } else {
                 $type = "EventX";
             }
@@ -451,10 +462,12 @@ class LevelController extends Controller
         $end = $request->get('endLevel');
 
         $type = null;
-        if ($levelType === 0) {
+        if ($levelType == 0) {
             $type = 'Saga';
-        } else if ($levelType === 1) {
+        } else if ($levelType == 1) {
             $type = 'Rush';
+        } else if ($levelType == 2) {
+            $type = 'Adventure';
         } else {
             $type = "EventX";
         }

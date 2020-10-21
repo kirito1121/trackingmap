@@ -40,7 +40,7 @@
         :expanded="expanded"
         :headers="headers"
         :items="data"
-        items-per-page="20"
+        :itemsPerPage="Number(20)"
         :loading="true"
         @click:row="clicked"
         class="elevation-1"
@@ -181,8 +181,8 @@ export default {
           value: "appVersion",
         },
         {
-          text: "Action",
-          text: "action",
+          text: "Booster(R_T_P)",
+          value: "gara",
         },
       ],
       data: [{}],
@@ -284,7 +284,12 @@ export default {
             if (index == 1) {
               txt += this.findItem(array[index], this.entity.levels);
             }
-          } else if (txt == "Bollard") {
+          }  else if (txt == "ColorChanger") {
+            style = "position:absolute;z-index:1";
+            if (index == 1) {
+              txt += this.findItem(array[index], this.entity.entityColor);
+            }
+          }else if (txt == "Bollard") {
             style = "position:absolute ; z-index:3";
             if (index == 1) {
               txt += this.findItem(array[index], this.entity.bollard);
@@ -593,7 +598,6 @@ export default {
 
   mounted() {
     this.getEntity();
-    this.fillData();
   },
 };
 </script>
