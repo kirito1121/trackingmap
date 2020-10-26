@@ -102,15 +102,21 @@ class LevelController extends Controller
             $type = "EventX";
         }
 
+        $arlv = mb_split(',',$level);
+        // $appVersion = mb_split(',',$appVersion);
+        if(count($arlv) === 1){
+            $arlv = [$arlv[0],$arlv[0]];
+        }
+
         $levels = DB::table('levels')
-            ->when($level, function ($query) use ($level) {
-                $query->where('level', $level);
+            ->when($level, function ($query) use ($arlv) {
+                $query->whereBetween('level', $arlv);
             })
             ->when($levelVersion, function ($query) use ($levelVersion) {
                 $query->where('levelVersion', $levelVersion);
             })
             ->when($appVersion, function ($query) use ($appVersion) {
-                $query->where('AppVersion', $appVersion);
+                $query->whereIn('AppVersion', $appVersion);
             })
             ->when($levelType >= 0, function ($query) use ($type) {
                 $query->where('levelType', $type);
@@ -146,6 +152,7 @@ class LevelController extends Controller
                 'appVersion' => $level->appVersion,
                 'score' => $levelitem['d'],
                 'gara' => $levelitem['f'] ?? null,
+                'mana' => $levelitem['o'] ?? null,
                 'c' => $c,
                 'i' => $levelitem['i'],
                 'j' => $levelitem['j'] ?? null,
@@ -451,140 +458,6 @@ class LevelController extends Controller
         } catch (\Throwable $th) {
             return $th;
         }
-    }
-    // test api
-    public function readDataMapApi(Request $request)
-    {
-        $level = $request->get('level');
-        $sublevel = $request->get('sublevel');
-        $levelType = intval($request->get('levelType'));
-        $start = $request->get('startLevel');
-        $end = $request->get('endLevel');
-
-        $type = null;
-        if ($levelType == 0) {
-            $type = 'Saga';
-        } else if ($levelType == 1) {
-            $type = 'Rush';
-        } else if ($levelType == 2) {
-            $type = 'Adventure';
-        } else {
-            $type = "EventX";
-        }
-        // return $type;
-        $sub = isset($sublevel) ? "AND subLevel = '$sublevel'" : "";
-
-        $levels = [];
-        for ($i = $start; $i <= $end; $i++) {
-            $sql = "SELECT * FROM levels
-                    WHERE `level` = $i
-                    AND levelType = '$type'
-                    $sub
-                    AND levelVersion = (SELECT MAX(levelVersion) FROM levels WHERE `level` = $i AND levelType = '$type' $sub)
-                    ";
-
-            $level = DB::select($sql);
-            $levels = array_merge($levels, $level);
-        }
-        $levels = collect($levels)->sortBy('level');
-        $array = [];
-        foreach ($levels as $key => $level) {
-            $data = $this->convertFileLv($level);
-            $data['level'] = $level->level;
-            $data['sublevel'] = $level->sublevel;
-            array_push($array, $data);
-        }
-        $cl = collect($array);
-        $obs = $cl->map(function ($item, $k) {
-            $data = [
-                'level' => $item['level'],
-                'sublevel' => $item['sublevel'],
-                'target' => array_search($item['a'], config('entity.targetType')),
-                'mapLevel' => $item['g'] . 'x' . $item['h'],
-                'countTarget' => $item['b'],
-                'move' => $item['c'],
-                'hardLevel' => $item['k'] == 0 ? 'No' : 'Yes',
-                'version' => $item['v'],
-            ];
-            $mapCollect = collect($item['i']);
-
-            $map = $mapCollect->map(function ($m) {
-                $arrB = explode(',', $m);
-                $data = [];
-                foreach ($arrB as $key => $value) {
-                    $arrM = explode('_', $value);
-                    $data = array_merge($data, [$arrM]);
-                }
-                $col = collect($data);
-                $data = $col->map(function ($item) {
-                    for ($i = 0; $i < count($item); $i++) {
-                        if ($i == 0) {
-                            $item[$i] = array_search($item[$i], config('entity.obsType'));
-                        }
-                        if ($item[0]) {
-                            if ($item[0] == 'TrafficCone') {
-                                if ($i == 1) {
-                                    $item[$i] = array_search($item[$i], config('entity.levels'));
-                                }
-                                if ($i == 2) {
-
-                                    $item[$i] = array_search($item[$i], config('entity.entityColor'));
-                                }
-                            } else if ($item[0] == 'Locker') {
-                                if ($i == 1) {
-                                    $item[$i] = array_search($item[$i], config('entity.levels'));
-                                }
-                            } else if ($item[0] == 'Bollard') {
-                                if ($i == 1) {
-                                    $item[$i] = array_search($item[$i], config('entity.bollard'));
-                                }
-                            } else if ($item[0] == 'Tunnel') {
-                                if ($i == 1) {
-                                    $item[$i] = array_search($item[$i], config('entity.direction'));
-                                }
-                                if ($i == 2) {
-                                    $item[$i] = false;
-                                }
-                                if ($i == 3) {
-                                    $item[$i] = false;
-                                }
-                            } else if ($item[0] == 'Barrier') {
-                                if ($i == 1) {
-                                    $item[$i] = array_search($item[$i], config('entity.direction'));
-                                }
-                                if ($i == 2) {
-                                    $item[$i] = false;
-                                }
-                                if ($i == 3) {
-                                    $item[$i] = false;
-                                }
-                            } else if ($item[0] == 'Container') {
-                                if ($i == 1) {
-                                    $item[$i] = array_search($item[$i], config('entity.entityColor'));
-                                }
-                            } else {
-                                if ($i == 1) {
-                                    $item[$i] = array_search($item[$i], config('entity.direction'));
-                                }
-                                if ($i == 2) {
-                                    $item[$i] = array_search($item[$i], config('entity.entityColor'));
-                                }
-
-                            }
-                        } else {
-                            $item[$i] = null;
-                        }
-                    }
-                    return implode('', $item);
-                });
-                return $data;
-            });
-
-            $data['obstacle'] = array_count_values(array_diff(Arr::flatten($map->toArray()), [""]));
-            return $data;
-        });
-
-        return $obs;
     }
 
     public function delete(Request $request){

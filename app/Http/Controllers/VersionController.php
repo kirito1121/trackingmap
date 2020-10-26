@@ -12,7 +12,7 @@ class VersionController extends Controller
     public function index()
     {
         return Cache::rememberForever('versions', function () {
-            return collect(DB::table('versions')->pluck('version'))->toArray();
+            return collect(DB::table('versions')->orderBy('day_start')->pluck('version'))->toArray();
         });
     }
 

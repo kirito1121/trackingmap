@@ -1,35 +1,90 @@
 <template>
   <v-card>
+    <v-alert dense outlined color="#3490dc" type="info">
+      <strong> Level </strong>: <strong>Nhập level đầu và cuối</strong> ví dụ
+      <strong>1,2</strong> Hoặc nhập một level bất kì và không nhập AppVersion
+      để tìm hết version của level đó
+    </v-alert>
+    <v-alert dense outlined color="#3490dc" type="info">
+      <strong> Level type</strong>: <strong> Nhập số </strong> saga là
+      <strong> 0 </strong> rush là <strong> 1 </strong> adventure là
+      <strong> 2 </strong>
+    </v-alert>
+    <v-alert dense outlined color="#3490dc" type="info">
+      <strong> Sub Level </strong>:
+      <strong> Nhập số, tìm chung với Rush or adventure nếu cần </strong> tìm
+      với saga sẽ <strong> không có kết quả </strong>
+    </v-alert>
+    <v-alert dense outlined color="#3490dc" type="info">
+      <strong> Version </strong>: <strong> Nhập số </strong> là version của
+      level
+    </v-alert>
+    <v-alert dense outlined color="#3490dc" type="info">
+      <strong> App Version </strong>: <strong> Chọn version cần tìm </strong> là
+      version của game
+    </v-alert>
+
     <v-card-title>
       <v-row justify="space-between">
         <v-col cols="12" md="4">
-          <v-text-field hide-details label="Level" single-line v-model="searchData.level"></v-text-field>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-text-field hide-details label="Level Type" single-line v-model="searchData.levelType"></v-text-field>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-text-field hide-details label="Sub level" single-line v-model="searchData.sublevel"></v-text-field>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-text-field hide-details label="Version" single-line v-model="searchData.version"></v-text-field>
+          <v-text-field
+            hide-details
+            label="Level"
+            single-line
+            v-model="searchData.level"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
           <v-text-field
             hide-details
-            label="App Version"
+            label="Level Type"
             single-line
-            v-model="searchData.appVersion"
+            v-model="searchData.levelType"
           ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
+          <v-text-field
+            hide-details
+            label="Sub level"
+            single-line
+            v-model="searchData.sublevel"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-text-field
+            hide-details
+            label="Version"
+            single-line
+            v-model="searchData.version"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-select
+            :items="versions"
+            multiple
+            chips
+            v-model="searchData.appVersion"
+            :menu-props="{ top: true, offsetY: true }"
+            label="App Version"
+          ></v-select>
+        </v-col>
+        <v-col cols="12" md="4">
           <div class="my-2">
-            <v-btn @click="searchLevel()" color="#3490dc" dark small>Search</v-btn>
+            <v-btn @click="searchLevel()" color="#3490dc" dark small
+              >Search</v-btn
+            >
           </div>
         </v-col>
         <v-col cols="12" md="4">
           <div class="my-2">
-            <v-btn @click="back" color="#3490dc" dark small :disabled="!searchData.level">Back</v-btn>
+            <v-btn
+              @click="back"
+              color="#3490dc"
+              dark
+              small
+              :disabled="!searchData.level"
+              >Back</v-btn
+            >
             <v-btn @click="next" color="#3490dc" dark small>Next</v-btn>
           </div>
         </v-col>
@@ -40,7 +95,7 @@
         :expanded="expanded"
         :headers="headers"
         :items="data"
-        :itemsPerPage="Number(20)"
+        :itemsPerPage="Number(100)"
         :loading="true"
         @click:row="clicked"
         class="elevation-1"
@@ -49,43 +104,65 @@
         loading-text="Loading... Please wait"
         show-expand
       >
-        <template v-slot:expanded-item="{ item,headers }">
-          <td :colspan="headers.length" class="text-start p-3">
+
+        <template v-slot:expanded-item="{ item }">
+          <td :colspan="4" class="text-start p-3">
             <v-card class="p-2" v-if="item['i']">
-              <!-- <v-card-title>{{item.obstacle}}</v-card-title> -->
-              <v-card-text >
-                <v-row class="d-flex" >
-                  <v-col class="ml-2" style="max-width:650px">
-                    <v-row style="margin-right: -80px;" :key="'row'+kr" class="ml-2" v-for="(kr,i) in Number(item['g'])">
+              <v-card-text>
+                <v-row class="d-flex">
+                  <v-col class="ml-2" style="max-width: 650px">
+                    <v-row
+                      style="margin-right: -80px"
+                      :key="'row' + kr"
+                      class="ml-2"
+                      v-for="(kr, i) in Number(item['g'])"
+                    >
                       <v-col
                         :cols="item['g']"
-                        :key="'col'+ch"
+                        :key="'col' + ch"
                         md="1"
                         style="padding: 0"
-                        v-for="(ch,k) in Number(item['h'])"
+                        v-for="(ch, k) in Number(item['h'])"
                       >
                         <div v-if="item['j']">
                           <div
-                            v-for="(train,keyTrain) in convertImageTrain(item['g'],item['h'],i,k,item['j'],false)"
-                            :key="'train'+keyTrain"
+                            v-for="(train, keyTrain) in convertImageTrain(
+                              item['g'],
+                              item['h'],
+                              i,
+                              k,
+                              item['j'],
+                              false
+                            )"
+                            :key="'train' + keyTrain"
                           >
                             <v-img
-                              v-if="train.coordinates === i+'_'+k"
-                              style="position: absolute; z-index:2"
+                              v-if="train.coordinates === i + '_' + k"
+                              style="position: absolute; z-index: 2"
                               :src="train.src"
                             ></v-img>
                           </div>
                         </div>
 
                         <div v-if="item['l']">
-                          <div v-for="(tram,keytram) in item['l']" :key="'tram'+keytram">
+                          <div
+                            v-for="(tram, keytram) in item['l']"
+                            :key="'tram' + keytram"
+                          >
                             <div
-                              v-for="(train,keyTrain) in convertImageTrain(item['g'],item['h'],i,k,tram,true)"
-                              :key="'train'+keyTrain"
+                              v-for="(train, keyTrain) in convertImageTrain(
+                                item['g'],
+                                item['h'],
+                                i,
+                                k,
+                                tram,
+                                true
+                              )"
+                              :key="'train' + keyTrain"
                             >
                               <v-img
-                                v-if="train.coordinates === i+'_'+k"
-                                style="position: absolute; z-index:2"
+                                v-if="train.coordinates === i + '_' + k"
+                                style="position: absolute; z-index: 2"
                                 :src="train.src"
                               ></v-img>
                             </div>
@@ -93,13 +170,19 @@
                         </div>
 
                         <v-img
-                          v-for="(item,key) in convertImage(i,k,item['cp'])"
+                          v-for="(item, key) in convertImage(i, k, item['cp'])"
                           :style="item.style"
                           :src="item.src"
-                          :key="key+'_'+i+'_'+k"
+                          :key="key + '_' + i + '_' + k"
                         ></v-img>
-                        <v-img src="/storage/images/Cell1.png" v-if="(i+k)%2 == 0"></v-img>
-                        <v-img src="/storage/images/Cell2.png" v-if="(i+k)%2 != 0"></v-img>
+                        <v-img
+                          src="/storage/images/Cell1.png"
+                          v-if="(i + k) % 2 == 0"
+                        ></v-img>
+                        <v-img
+                          src="/storage/images/Cell2.png"
+                          v-if="(i + k) % 2 != 0"
+                        ></v-img>
                       </v-col>
                     </v-row>
                   </v-col>
@@ -109,6 +192,17 @@
                 <v-btn @click="showDialog(item['id'])">Delete this level</v-btn>
               </v-card-actions>
             </v-card>
+          </td>
+          <td :colspan="4" class="text-start p-3">
+              <v-card class="p-2" v-if="item['i']">
+                  <v-card-text>
+                      <v-row class="d-flex">
+                          <v-col class="ml-2" style="max-width: 650px" >
+
+                          </v-col>
+                      </v-row>
+                  </v-card-text>
+              </v-card>
           </td>
         </template>
       </v-data-table>
@@ -184,6 +278,10 @@ export default {
           text: "Booster(R_T_P)",
           value: "gara",
         },
+        {
+          text: "Mana",
+          value: "mana",
+        },
       ],
       data: [{}],
       searchData: {
@@ -195,10 +293,13 @@ export default {
       },
       a: 0,
       entity: null,
+      versions: null,
       arraycoordinates: [],
       itemId: null,
     };
   },
+
+
   methods: {
     getDataLevel(params) {
       axios
@@ -207,6 +308,24 @@ export default {
         })
         .then((response) => {
           this.data = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
+    getDataPlay(version,level,subLevel,levelType){
+        axios
+        .get("api/level/playData", {
+          params: {
+              appVersion: version,
+              level: level,
+              subLevel: subLevel,
+              levelType: levelType
+          },
+        })
+        .then((response) => {
+          this.dataPlay = response.data;
         })
         .catch((error) => {
           console.log(error);
@@ -226,6 +345,17 @@ export default {
           console.log(error);
         });
     },
+    getVersions() {
+      axios
+        .get("api/versions")
+        .then((response) => {
+          this.versions = response.data;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
     clicked(value) {
       this.expanded.push(value);
     },
@@ -284,12 +414,12 @@ export default {
             if (index == 1) {
               txt += this.findItem(array[index], this.entity.levels);
             }
-          }  else if (txt == "ColorChanger") {
+          } else if (txt == "ColorChanger") {
             style = "position:absolute;z-index:1";
             if (index == 1) {
               txt += this.findItem(array[index], this.entity.entityColor);
             }
-          }else if (txt == "Bollard") {
+          } else if (txt == "Bollard") {
             style = "position:absolute ; z-index:3";
             if (index == 1) {
               txt += this.findItem(array[index], this.entity.bollard);
@@ -318,7 +448,7 @@ export default {
             if (index == 1) {
               txt += this.findItem(array[index], this.entity.direction);
             }
-          }else if (txt.search("Bench") > -1) {
+          } else if (txt.search("Bench") > -1) {
             style = "position:absolute ; z-index:3;";
             if (index == 1) {
               txt += this.findItem(array[index], this.entity.direction);
@@ -586,18 +716,19 @@ export default {
         });
     },
 
-    next(){
-        this.searchData.level++
-        this.getDataLevel(this.searchData);
+    next() {
+      this.searchData.level++;
+      this.getDataLevel(this.searchData);
     },
-    back(){
-        this.searchData.level--
-        this.getDataLevel(this.searchData);
-    }
+    back() {
+      this.searchData.level--;
+      this.getDataLevel(this.searchData);
+    },
   },
 
   mounted() {
     this.getEntity();
+    this.getVersions();
   },
 };
 </script>
